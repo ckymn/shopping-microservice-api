@@ -36,6 +36,7 @@ module.exports = customerSchema = new model(
           delete ret.__v;
         },
       },
+      versionKey: false,
       timestamps: true,
     }
   )
