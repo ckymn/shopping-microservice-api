@@ -1,4 +1,10 @@
-const express = require("express");
-const router = express.Router();
+const create = (req, res) => {
+  res.status(200).send({
+    status: "OK",
+    message: "Customer is paid more money'",
+  });
+};
 
-module.exports = getCustomer = () => {};
+module.exports = {
+  create,
+};

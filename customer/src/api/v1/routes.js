@@ -1,10 +1,7 @@
-const customer = require("./controllers/customer.controllers");
+const express = require("express");
+const router = express.Router();
+const { create } = require("./controllers/customer.controllers");
 
-module.exports = customerRoutes = (app) => {
-  app.get("/", (req, res, next) => {
-    res.status(200).send({
-      status: "OK",
-      message: "Main Page",
-    });
-  });
-};
+router.get("/", create);
+
+module.exports = router;

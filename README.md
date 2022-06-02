@@ -8,4 +8,4 @@ But, in microservices architecture the scenario is different.
 So, this was about what we are building in this tutorial, let’s get started with the coding part.
 ```
 
-<img width="500" alt="image" src="https://user-images.githubusercontent.com/60356676/171612095-bf3a7006-75ba-4655-b6e4-16e4fbe83815.png">
+<img width="738" alt="image" src="https://user-images.githubusercontent.com/60356676/171612095-bf3a7006-75ba-4655-b6e4-16e4fbe83815.png">
