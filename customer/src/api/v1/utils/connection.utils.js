@@ -1,17 +1,17 @@
 const mongoose = require("mongoose");
-const { DB_URL } = require("../config");
 
 module.exports = async () => {
   try {
-    await mongoose.connect(DB_URL, {
+    const connect = await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
     });
-    console.log("Db Connected");
+    console.log(
+      `MongoDb connected name : ${connect.connection.name} on ${connect.connection.port} port`
+    );
   } catch (error) {
-    console.log("Error ============");
-    console.log(error);
-    process.exit(1);
+    console.log("DB DEFAULT ERROR : ", error);
+    process.exit(1); // kill program
   }
 };

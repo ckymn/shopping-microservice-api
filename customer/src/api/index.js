@@ -1,12 +1,13 @@
-require("dotenv").config();
-const databaseConnection = require("./v1/utils/connection.utils");
-const createServer = require("./v1/utils/server.utils");
+const { connection, server } = require("./v1/utils");
+const config = require("./v1/config");
 
-const app = await createServer(app);
+config();
+
+const app = server();
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, async () => {
   console.log(`listening to port ${PORT}`);
 
-  await databaseConnection();
+  await connection();
 });
