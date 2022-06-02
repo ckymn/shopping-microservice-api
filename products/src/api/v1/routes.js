@@ -1,7 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { create } = require("./controllers/customer.controllers");
+const {
+  createController,
+  listController,
+} = require("./controllers/customer.controller");
 
-router.get("/", create);
+router.post("/customer/signup", createController);
+router.get("/customer/profile", listController);
 
 module.exports = router;
