@@ -12,11 +12,8 @@ module.exports = createServer = () => {
   app.use(helmet());
   app.use(cors());
 
-  //api
-  routes(app);
-
   // error handling
-  app.use(HandleErrors);
+  // app.use(HandleErrors);
 
   return app;
 };
