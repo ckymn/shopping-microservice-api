@@ -1,4 +1,5 @@
 const customerSchema = require("../models/customer.model");
+const passwordToHash = require("../utils/helper.utils");
 
 const createService = async (data) => {
   const customerData = await new customerSchema(data);
@@ -9,10 +10,21 @@ const createService = async (data) => {
   }
 };
 
-const listService = async () => {
-  const customers = await customerSchema.find({
-    _id: "629915487061e72a0db60548",
+const loginService = async (data) => {
+  const password = passwordToHash(data.password).toString();
+
+  const customerData = await customerSchema.findOne({
+    $and: [{ email: data.email }, { password }],
   });
+  if (!customerData) {
+    return false;
+  } else {
+    return customerData;
+  }
+};
+
+const profileService = async (data) => {
+  const customers = await customerSchema.find({ _id: data.id });
   if (!customers) {
     return false;
   } else {
@@ -22,5 +34,6 @@ const listService = async () => {
 
 module.exports = {
   createService,
-  listService,
+  loginService,
+  profileService,
 };

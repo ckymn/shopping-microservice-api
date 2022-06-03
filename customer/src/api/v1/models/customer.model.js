@@ -3,8 +3,8 @@ const logger = require("../scripts/logger/customer.log");
 
 const customerSchema = new Schema(
   {
-    email: String,
-    password: String,
+    email: { type: String, require: true, unique: true },
+    password: { type: String, require: true },
     salt: String,
     phone: String,
     address: [{ type: Schema.Types.ObjectId, ref: "address", require: true }],
