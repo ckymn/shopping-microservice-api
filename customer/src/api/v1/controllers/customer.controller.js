@@ -1,10 +1,13 @@
 const { createService, listService } = require("../services/customer.service");
 const httpStatus = require("http-status");
+const passwordToHash = require("../utils/helper.utils");
 
 const createController = async (req, res) => {
   const { body } = req;
+  const password = passwordToHash(body.password);
+
   try {
-    const customer = await createService(body);
+    const customer = await createService({ ...body, password });
     if (!customer) {
       res.status(httpStatus.BAD_REQUEST).send({
         status: "FAILED",
