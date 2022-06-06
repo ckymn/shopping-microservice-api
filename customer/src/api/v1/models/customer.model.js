@@ -39,7 +39,6 @@ const customerSchema = new Schema(
     timestamps: true,
   }
 );
-
 customerSchema.post("save", (doc, next) => {
   logger.log({
     level: "info",
@@ -48,4 +47,25 @@ customerSchema.post("save", (doc, next) => {
   next();
 });
 
-module.exports = model("customer", customerSchema);
+const customerAddress = new Schema(
+  {
+    street: { type: String },
+    postalCode: { type: String },
+    country: { type: String },
+    city: { type: String },
+  },
+  {
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.__v;
+      },
+    },
+    versionKey: false,
+    timestamps: true,
+  }
+);
+
+module.exports = {
+  customerSchema: model("customer", customerSchema),
+  customerAddress: model("address", customerAddress),
+};

@@ -2,6 +2,7 @@ const {
   createService,
   profileService,
   loginService,
+  addressService,
 } = require("../services/customer.service");
 const httpStatus = require("http-status");
 const passwordToHash = require("../utils/helper.utils");
@@ -69,6 +70,7 @@ const loginController = async (req, res) => {
 
 const profileController = async (req, res) => {
   const { user } = req;
+  console.log(user);
   try {
     const customers = await profileService(user);
     if (!customers) {
@@ -89,8 +91,33 @@ const profileController = async (req, res) => {
     });
   }
 };
+
+const addressController = async (req, res) => {
+  const { body, user } = req;
+  try {
+    const address = await addressService(user.id, body);
+    if (!address) {
+      return res.status(httpStatus.BAD_REQUEST).send({
+        status: "FAILED",
+        data: { error: "Data save problems" },
+      });
+    } else {
+      res.status(httpStatus.CREATED).send({
+        status: "OK",
+        data: address,
+      });
+    }
+  } catch (error) {
+    return res.status(error?.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: "FAILED",
+      data: { error: error?.message || error },
+    });
+  }
+};
+
 module.exports = {
   createController,
   loginController,
   profileController,
+  addressController,
 };

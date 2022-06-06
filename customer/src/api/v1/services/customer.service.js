@@ -1,8 +1,8 @@
-const customerSchema = require("../models/customer.model");
+const { customerSchema, customerAddress } = require("../models/customer.model");
 const passwordToHash = require("../utils/helper.utils");
 
 const createService = async (data) => {
-  const customerData = await new customerSchema(data);
+  const customerData = new customerSchema(data);
   if (!customerData) {
     return false;
   } else {
@@ -32,8 +32,18 @@ const profileService = async (data) => {
   }
 };
 
+const addressService = async (_id, data) => {
+  const address = new customerAddress({ ...data, _id });
+  if (!address) {
+    return false;
+  } else {
+    return address.save();
+  }
+};
+
 module.exports = {
   createService,
   loginService,
   profileService,
+  addressService,
 };
