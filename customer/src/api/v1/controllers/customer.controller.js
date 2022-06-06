@@ -70,7 +70,6 @@ const loginController = async (req, res) => {
 
 const profileController = async (req, res) => {
   const { user } = req;
-  console.log(user);
   try {
     const customers = await profileService(user);
     if (!customers) {

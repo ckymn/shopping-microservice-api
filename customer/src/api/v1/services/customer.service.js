@@ -24,7 +24,10 @@ const loginService = async (data) => {
 };
 
 const profileService = async (data) => {
-  const customers = await customerSchema.find({ _id: data.id });
+  const customers = await customerSchema.findOne({ _id: data.id }).populate({
+    path: "address",
+    select: "street postalCode country city -_id",
+  });
   if (!customers) {
     return false;
   } else {
@@ -33,7 +36,12 @@ const profileService = async (data) => {
 };
 
 const addressService = async (_id, data) => {
-  const address = new customerAddress({ ...data, _id });
+  const address = new customerAddress(data);
+  await customerSchema.findOneAndUpdate(_id, {
+    $push: {
+      address: address._id,
+    },
+  });
   if (!address) {
     return false;
   } else {
