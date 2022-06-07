@@ -4,6 +4,7 @@ const { DB_URL } = require("../config");
 module.exports = async () => {
   try {
     await mongoose.connect(DB_URL, {
+      useFindAndModify: false,
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,

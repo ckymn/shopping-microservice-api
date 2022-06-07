@@ -5,13 +5,19 @@ const createValidation = Joi.object({
   password: Joi.string().required().min(3),
   salt: Joi.string(),
   phone: Joi.string(),
-  address: Joi.string(),
+  address: Joi.array(),
   cart: Joi.array().items({
     product: Joi.string(),
     unit: Joi.number(),
   }),
   wishlist: Joi.array(),
   orders: Joi.array(),
+});
+
+const updateValidation = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required().min(3),
+  phone: Joi.string(),
 });
 
 const loginValidation = Joi.object({
@@ -28,6 +34,7 @@ const addressValidation = Joi.object({
 
 module.exports = {
   createValidation,
+  updateValidation,
   loginValidation,
   addressValidation,
 };

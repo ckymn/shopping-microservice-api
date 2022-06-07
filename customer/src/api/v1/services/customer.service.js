@@ -10,6 +10,19 @@ const createService = async (data) => {
   }
 };
 
+const updateService = async (_id, data) => {
+  const update = await customerSchema.findOneAndUpdate(
+    _id,
+    { ...data },
+    { new: true }
+  );
+  if (!update) {
+    return false;
+  } else {
+    return update;
+  }
+};
+
 const loginService = async (data) => {
   const password = passwordToHash(data.password).toString();
 
@@ -54,4 +67,5 @@ module.exports = {
   loginService,
   profileService,
   addressService,
+  updateService,
 };

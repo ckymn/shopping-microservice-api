@@ -3,6 +3,7 @@ const {
   profileService,
   loginService,
   addressService,
+  updateService,
 } = require("../services/customer.service");
 const httpStatus = require("http-status");
 const passwordToHash = require("../utils/helper.utils");
@@ -23,6 +24,30 @@ const createController = async (req, res) => {
       });
     } else {
       res.status(httpStatus.CREATED).send({
+        status: "OK",
+        data: customer,
+      });
+    }
+  } catch (error) {
+    return res.status(error?.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: "FAILED",
+      data: { error: error?.message || error },
+    });
+  }
+};
+
+const updateController = async (req, res) => {
+  const { body, user } = req;
+
+  try {
+    const customer = await updateService(user.id, body);
+    if (!customer) {
+      return res.status(httpStatus.BAD_REQUEST).send({
+        status: "FAILED",
+        data: { error: "Data update problems" },
+      });
+    } else {
+      return res.status(httpStatus.OK).send({
         status: "OK",
         data: customer,
       });
@@ -119,4 +144,5 @@ module.exports = {
   loginController,
   profileController,
   addressController,
+  updateController,
 };
