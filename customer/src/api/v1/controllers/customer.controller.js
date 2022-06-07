@@ -1,3 +1,5 @@
+const { v4: uuidv4 } = require("uuid");
+const events = require("events");
 const {
   createService,
   profileService,
@@ -139,10 +141,19 @@ const addressController = async (req, res) => {
   }
 };
 
+const resetPassword = async (req, res) => {
+  try {
+    const newPassword =
+      uuidv4()?.split("-")[0] || `usr-${new Date().getTime()}`;
+    updateService();
+  } catch (error) {}
+};
+
 module.exports = {
   createController,
   loginController,
   profileController,
   addressController,
   updateController,
+  resetPassword,
 };
