@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const events = require("events");
+const eventEmitter = require("../scripts/events/eventEmitter");
 const {
   createService,
   profileService,
@@ -40,9 +40,12 @@ const createController = async (req, res) => {
 
 const updateController = async (req, res) => {
   const { body, user } = req;
-
+  const password = passwordToHash(body.password).toString();
   try {
-    const customer = await updateService(user.id, body);
+    const customer = await updateService(
+      { _id: user.id },
+      { ...body, password: password }
+    );
     if (!customer) {
       return res.status(httpStatus.BAD_REQUEST).send({
         status: "FAILED",
@@ -142,11 +145,38 @@ const addressController = async (req, res) => {
 };
 
 const resetPassword = async (req, res) => {
+  const { body } = req;
   try {
     const newPassword =
       uuidv4()?.split("-")[0] || `usr-${new Date().getTime()}`;
-    updateService();
-  } catch (error) {}
+
+    const customer = await updateService(
+      { email: body.email },
+      { password: passwordToHash(newPassword).toString() }
+    );
+    if (!customer) {
+      return res.status(httpStatus.NOT_FOUND).send({
+        status: "FAILED",
+        data: { error: "Customer not found" },
+      });
+    } else {
+      // ! eventEmitter
+      eventEmitter.emit("send_email", {
+        to: customer.email,
+        subject: "Sifre Sifirlama",
+        html: `Talebiniz Uzerine Sifre Sifirlama Islemi Gerceklesmistir. <br /> Giris Yaptiktan Sonra Sifre Sifrenizi Degistirmeyi Unutmayin! <br /> Yeni Sifreniz : <b> ${newPassword}</b>`,
+      });
+      return res.status(httpStatus.OK).send({
+        status: "OK",
+        data: customer,
+      });
+    }
+  } catch (error) {
+    return res.status(error?.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: "FAILED",
+      data: { error: error?.message || error },
+    });
+  }
 };
 
 module.exports = {

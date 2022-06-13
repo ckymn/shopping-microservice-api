@@ -1,8 +1,10 @@
 const { connection, createServer } = require("./v1/utils");
 const config = require("./v1/config");
+const events = require("./v1/scripts/events");
 const Routes = require("./v1/routes");
 
 config();
+events();
 
 const app = createServer();
 const PORT = process.env.PORT || 3000;

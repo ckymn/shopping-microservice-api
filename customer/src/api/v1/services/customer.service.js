@@ -10,12 +10,10 @@ const createService = async (data) => {
   }
 };
 
-const updateService = async (_id, data) => {
-  const update = await customerSchema.findOneAndUpdate(
-    _id,
-    { ...data },
-    { new: true }
-  );
+const updateService = async (where, data) => {
+  const update = await customerSchema.findOneAndUpdate(where, data, {
+    new: true,
+  });
   if (!update) {
     return false;
   } else {

@@ -25,6 +25,10 @@ const loginValidation = Joi.object({
   password: Joi.string().required().min(3),
 });
 
+const resetPasswordValidation = Joi.object({
+  email: Joi.string().email().required(),
+});
+
 const addressValidation = Joi.object({
   street: Joi.string().required(),
   postalCode: Joi.string(),
@@ -37,4 +41,5 @@ module.exports = {
   updateValidation,
   loginValidation,
   addressValidation,
+  resetPasswordValidation,
 };

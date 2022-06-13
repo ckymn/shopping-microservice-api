@@ -6,6 +6,7 @@ const {
   loginValidation,
   addressValidation,
   updateValidation,
+  resetPasswordValidation,
 } = require("./validations/customer.validation");
 
 const {
@@ -14,6 +15,7 @@ const {
   loginController,
   addressController,
   updateController,
+  resetPassword,
 } = require("./controllers/customer.controller");
 
 router.get("/customer/profile", auth, profileController);
@@ -30,6 +32,11 @@ router.post(
   auth,
   validate(addressValidation),
   addressController
+);
+router.patch(
+  "/customer/reset-password",
+  validate(resetPasswordValidation),
+  resetPassword
 );
 
 module.exports = router;
