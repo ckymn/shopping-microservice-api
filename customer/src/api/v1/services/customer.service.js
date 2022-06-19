@@ -10,6 +10,19 @@ const createService = async (data) => {
   }
 };
 
+const loginService = async (data) => {
+  const password = passwordToHash(data.password).toString();
+
+  const customerData = await customerSchema.findOne({
+    $and: [{ email: data.email }, { password }],
+  });
+  if (!customerData) {
+    return false;
+  } else {
+    return customerData;
+  }
+};
+
 const updateService = async (where, data) => {
   const update = await customerSchema.findOneAndUpdate(where, data, {
     new: true,
@@ -21,16 +34,13 @@ const updateService = async (where, data) => {
   }
 };
 
-const loginService = async (data) => {
-  const password = passwordToHash(data.password).toString();
-
-  const customerData = await customerSchema.findOne({
-    $and: [{ email: data.email }, { password }],
-  });
-  if (!customerData) {
+const deleteService = async (where) => {
+  const remove = await customerSchema.findOneAndDelete(where);
+  console.log("customer remove ", remove);
+  if (!remove) {
     return false;
   } else {
-    return customerData;
+    return remove;
   }
 };
 
@@ -66,4 +76,5 @@ module.exports = {
   profileService,
   addressService,
   updateService,
+  deleteService,
 };

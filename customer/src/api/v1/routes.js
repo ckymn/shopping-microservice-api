@@ -15,7 +15,9 @@ const {
   loginController,
   addressController,
   updateController,
-  resetPassword,
+  resetPasswordContoller,
+  deleteController,
+  updateProfileImage,
 } = require("./controllers/customer.controller");
 
 router.get("/customer/profile", auth, profileController);
@@ -36,7 +38,9 @@ router.post(
 router.patch(
   "/customer/reset-password",
   validate(resetPasswordValidation),
-  resetPassword
+  resetPasswordContoller
 );
+router.delete("/customer/delete/:id", auth, deleteController);
+router.post("/customer/update-profile-image", auth, updateProfileImage);
 
 module.exports = router;

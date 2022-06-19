@@ -5,6 +5,7 @@ const customerSchema = new Schema(
   {
     email: { type: String, require: true, unique: true },
     password: { type: String, require: true },
+    profile_image: { type: String },
     salt: String,
     phone: String,
     address: [{ type: Schema.Types.ObjectId, ref: "address", require: true }],
@@ -39,6 +40,7 @@ const customerSchema = new Schema(
     timestamps: true,
   }
 );
+
 customerSchema.post("save", (doc, next) => {
   logger.log({
     level: "info",

@@ -1,11 +1,13 @@
 const { v4: uuidv4 } = require("uuid");
 const eventEmitter = require("../scripts/events/eventEmitter");
+const path = require("path");
 const {
   createService,
   profileService,
   loginService,
   addressService,
   updateService,
+  deleteService,
 } = require("../services/customer.service");
 const httpStatus = require("http-status");
 const passwordToHash = require("../utils/helper.utils");
@@ -28,6 +30,39 @@ const createController = async (req, res) => {
       res.status(httpStatus.CREATED).send({
         status: "OK",
         data: customer,
+      });
+    }
+  } catch (error) {
+    return res.status(error?.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: "FAILED",
+      data: { error: error?.message || error },
+    });
+  }
+};
+
+const loginController = async (req, res) => {
+  const { body } = req;
+  try {
+    const customer = await loginService(body);
+
+    if (!customer) {
+      return res.status(httpStatus.NOT_FOUND).send({
+        status: "FAILED",
+        data: { error: "Data not found" },
+      });
+    } else {
+      // accessToken, refreshToken
+      const result = {
+        ...customer.toObject(),
+        tokens: {
+          access_token: generateAccessToken(customer),
+          refresh_token: generateRefreshToken(customer),
+        },
+      };
+      delete result.password;
+      res.status(httpStatus.OK).send({
+        status: "OK",
+        data: result,
       });
     }
   } catch (error) {
@@ -65,29 +100,21 @@ const updateController = async (req, res) => {
   }
 };
 
-const loginController = async (req, res) => {
-  const { body } = req;
+const deleteController = async (req, res) => {
+  const {
+    params: { id },
+  } = req;
   try {
-    const customer = await loginService(body);
-
+    const customer = await deleteService({ _id: id });
     if (!customer) {
       return res.status(httpStatus.NOT_FOUND).send({
         status: "FAILED",
-        data: { error: "Data not found" },
+        data: { error: "Data delete not found" },
       });
     } else {
-      // accessToken, refreshToken
-      const result = {
-        ...customer.toObject(),
-        tokens: {
-          access_token: generateAccessToken(customer),
-          refresh_token: generateRefreshToken(customer),
-        },
-      };
-      delete result.password;
-      res.status(httpStatus.OK).send({
+      return res.status(httpStatus.OK).send({
         status: "OK",
-        data: result,
+        data: "Customer delete success",
       });
     }
   } catch (error) {
@@ -144,7 +171,7 @@ const addressController = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
+const resetPasswordContoller = async (req, res) => {
   const { body } = req;
   try {
     const newPassword =
@@ -179,11 +206,62 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const updateProfileImage = async (req, res) => {
+  const { files } = req;
+  try {
+    if (!files?.profile_image) {
+      return res.status(httpStatus.BAD_REQUEST).send({
+        status: "FAILED",
+        data: { error: "There is not enough data" },
+      });
+    } else {
+      const fileName = `${req.user.id}${path.extname(
+        files.profile_image.name
+      )}`;
+      const folderPath = path.join(__dirname, "../", "uploads/users", fileName);
+      files.profile_image.mv(folderPath, async (err) => {
+        if (err) {
+          return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+            status: "FAILED",
+            data: { error: err },
+          });
+        } else {
+          const updateImageToDatabase = await updateService(
+            { _id: req.user.id },
+            { profile_image: fileName }
+          );
+          if (!updateImageToDatabase) {
+            return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
+              status: "FAILED",
+              data: {
+                error:
+                  "Image Upload Success but Image save to database problem",
+              },
+            });
+          } else {
+            return res.status(httpStatus.OK).send({
+              status: "OK",
+              data: updateImageToDatabase,
+            });
+          }
+        }
+      });
+    }
+  } catch (error) {
+    return res.status(error?.status || httpStatus.INTERNAL_SERVER_ERROR).send({
+      status: "FAILED",
+      data: { error: error?.message || error },
+    });
+  }
+};
+
 module.exports = {
   createController,
   loginController,
   profileController,
   addressController,
   updateController,
-  resetPassword,
+  resetPasswordContoller,
+  deleteController,
+  updateProfileImage,
 };
