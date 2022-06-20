@@ -156,7 +156,6 @@ const addressController = async (req, res) => {
         },
       }
     );
-    console.log("customer ->", customer);
     if (!address) {
       return res.status(httpStatus.BAD_REQUEST).send({
         status: "FAILED",
