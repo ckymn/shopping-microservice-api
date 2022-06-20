@@ -1,46 +1,46 @@
 const express = require("express");
 const router = express.Router();
 const { validate, auth } = require("./middleware");
-const {
-  createValidation,
-  loginValidation,
-  addressValidation,
-  updateValidation,
-  resetPasswordValidation,
-} = require("./validations/customer.validation");
+const CustomerValidation = require("./validations/customer.validation");
+const CustomerController = require("./controllers/customer.controller");
 
-const {
-  createController,
-  profileController,
-  loginController,
-  addressController,
-  updateController,
-  resetPasswordContoller,
-  deleteController,
-  updateProfileImage,
-} = require("./controllers/customer.controller");
-
-router.get("/customer/profile", auth, profileController);
-router.post("/customer/signup", validate(createValidation), createController);
-router.post("/customer/login", validate(loginValidation), loginController);
+router.get("/customer/profile", auth, CustomerController.profileController);
+router.post(
+  "/customer/signup",
+  validate(CustomerValidation.createValidation),
+  CustomerController.createController
+);
+router.post(
+  "/customer/login",
+  validate(CustomerValidation.loginValidation),
+  CustomerController.loginController
+);
 router.patch(
   "/customer/updateProfile",
   auth,
-  validate(updateValidation),
-  updateController
+  validate(CustomerValidation.updateValidation),
+  CustomerController.updateController
 );
 router.post(
   "/customer/address",
   auth,
-  validate(addressValidation),
-  addressController
+  validate(CustomerValidation.addressValidation),
+  CustomerController.addressController
 );
 router.patch(
   "/customer/reset-password",
-  validate(resetPasswordValidation),
-  resetPasswordContoller
+  validate(CustomerValidation.resetPasswordValidation),
+  CustomerController.resetPasswordContoller
 );
-router.delete("/customer/delete/:id", auth, deleteController);
-router.post("/customer/update-profile-image", auth, updateProfileImage);
+router.delete(
+  "/customer/delete/:id",
+  auth,
+  CustomerController.deleteController
+);
+router.post(
+  "/customer/update-profile-image",
+  auth,
+  CustomerController.updateProfileImage
+);
 
 module.exports = router;

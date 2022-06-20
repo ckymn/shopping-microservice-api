@@ -22,4 +22,4 @@ class Customer extends BaseService {
   }
 }
 
-module.exports = Customer;
+module.exports = new Customer();
