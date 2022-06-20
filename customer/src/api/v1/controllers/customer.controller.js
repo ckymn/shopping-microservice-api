@@ -1,14 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const eventEmitter = require("../scripts/events/eventEmitter");
 const path = require("path");
-const {
-  createService,
-  profileService,
-  loginService,
-  addressService,
-  updateService,
-  deleteService,
-} = require("../services/customer.service");
 const httpStatus = require("http-status");
 const passwordToHash = require("../utils/helper.utils");
 const {
@@ -16,11 +8,14 @@ const {
   generateRefreshToken,
 } = require("../utils/jwt.utils");
 
+const Service = require("../services/customer.service");
+const CustomerService = new Service();
+
 const createController = async (req, res) => {
   const { body } = req;
   const password = passwordToHash(body.password);
   try {
-    const customer = await createService({ ...body, password });
+    const customer = await CustomerService.create({ ...body, password });
     if (!customer) {
       return res.status(httpStatus.BAD_REQUEST).send({
         status: "FAILED",
@@ -42,8 +37,11 @@ const createController = async (req, res) => {
 
 const loginController = async (req, res) => {
   const { body } = req;
+  const password = passwordToHash(body.password).toString();
   try {
-    const customer = await loginService(body);
+    const customer = await CustomerService.listOne({
+      $and: [{ email: body.email }, { password }],
+    });
 
     if (!customer) {
       return res.status(httpStatus.NOT_FOUND).send({
@@ -77,7 +75,7 @@ const updateController = async (req, res) => {
   const { body, user } = req;
   const password = passwordToHash(body.password).toString();
   try {
-    const customer = await updateService(
+    const customer = await CustomerService.update(
       { _id: user.id },
       { ...body, password: password }
     );
@@ -101,11 +99,9 @@ const updateController = async (req, res) => {
 };
 
 const deleteController = async (req, res) => {
-  const {
-    params: { id },
-  } = req;
+  const { params } = req;
   try {
-    const customer = await deleteService({ _id: id });
+    const customer = await CustomerService.delete({ _id: params.id });
     if (!customer) {
       return res.status(httpStatus.NOT_FOUND).send({
         status: "FAILED",
@@ -128,7 +124,7 @@ const deleteController = async (req, res) => {
 const profileController = async (req, res) => {
   const { user } = req;
   try {
-    const customers = await profileService(user);
+    const customers = await CustomerService.listOne({ _id: user.id });
     if (!customers) {
       return res.status(httpStatus.BAD_REQUEST).send({
         status: "FAILED",
@@ -151,7 +147,16 @@ const profileController = async (req, res) => {
 const addressController = async (req, res) => {
   const { body, user } = req;
   try {
-    const address = await addressService(user.id, body);
+    const address = await CustomerService.addAdress({ _id: user.id }, body);
+    const customer = await CustomerService.update(
+      { _id: user.id },
+      {
+        $push: {
+          address: address._id,
+        },
+      }
+    );
+    console.log("customer ->", customer);
     if (!address) {
       return res.status(httpStatus.BAD_REQUEST).send({
         status: "FAILED",
@@ -177,7 +182,7 @@ const resetPasswordContoller = async (req, res) => {
     const newPassword =
       uuidv4()?.split("-")[0] || `usr-${new Date().getTime()}`;
 
-    const customer = await updateService(
+    const customer = await CustomerService.update(
       { email: body.email },
       { password: passwordToHash(newPassword).toString() }
     );
@@ -226,10 +231,11 @@ const updateProfileImage = async (req, res) => {
             data: { error: err },
           });
         } else {
-          const updateImageToDatabase = await updateService(
+          const updateImageToDatabase = await CustomerService.update(
             { _id: req.user.id },
             { profile_image: fileName }
           );
+
           if (!updateImageToDatabase) {
             return res.status(httpStatus.INTERNAL_SERVER_ERROR).send({
               status: "FAILED",
