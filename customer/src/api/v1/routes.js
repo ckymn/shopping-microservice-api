@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { validate, auth } = require("./middleware");
+const { validate, auth, idChecker } = require("./middleware");
 const CustomerValidation = require("./validations/customer.validation");
 const CustomerController = require("./controllers/customer.controller");
 
@@ -34,6 +34,7 @@ router.patch(
 );
 router.delete(
   "/customer/delete/:id",
+  idChecker(),
   auth,
   CustomerController.deleteController
 );
